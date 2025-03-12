@@ -33,7 +33,7 @@ $salarioAnual = calculoSalarioAnual($pessoa['salarioMensal']);
  * @return string Retorna o valor no formato de moeda em real / Returns the value in currency format in real
  */
 function conversaoMoeda (float $valor) : string {
-    return 'R$ ' . \number_format($valor, 2, ',', '.');
+    return 'R$ ' . number_format($valor, 2, ',', '.');
 }
 
 
