@@ -1,43 +1,55 @@
 <?php
-// Inicia a sessão para armazenar dados do usuário durante a navegação
-session_start(); 
+session_start(); // Inicia a sessão para armazenar informações do usuário
 
-// Definição de credenciais de login (essas credenciais devem ser armazenadas de forma segura, preferencialmente em um banco de dados)
-$usuarioCorreto = 'admin';
-$senhaCorreta = '123456';
+// Array contendo os usuários cadastrados no sistema com login e senha
+$usuarios = [
+    [
+        'login' => 'admin',
+        'senha' => '123456'
+    ],
+    [
+        'login' => 'usuario1',
+        'senha' => 'senha123'
+    ],
+    [
+        'login' => 'cliente',
+        'senha' => 'minhasenha'
+    ],
+    [
+        'login' => 'dev',
+        'senha' => 'php2024'
+    ]
+];
 
-// Verifica se a requisição foi feita via método POST (o que significa que o formulário foi enviado)
+// Verifica se o formulário foi enviado via método POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Verifica se os campos de login e senha foram preenchidos
+
+    // Se algum dos campos estiver vazio, define uma mensagem de erro e redireciona de volta ao login
     if (empty($_POST['login']) || empty($_POST['password'])) {
-        // Armazena uma mensagem de erro na sessão para exibição na página de login
-        $_SESSION['mensagem'] = "Preencha todos os campos.";
-        
-        // Redireciona o usuário de volta para a página de login
-        header("Location: index.php");
-        exit; // Encerra a execução do script para evitar que mais código seja processado
+        $_SESSION['mensagem'] = "Preencha todos os campos."; // Armazena a mensagem na sessão
+        header("Location: index.php"); // Redireciona para a página de login
+        exit;
     }
 
-    // Obtém os valores do formulário e aplica `htmlspecialchars()` para evitar ataques XSS
-    $usuario = htmlspecialchars($_POST['login']);
-    $senha = htmlspecialchars($_POST['password']);
+    // Obtém os valores do formulário e aplica `htmlspecialchars` para evitar ataques XSS
+    $usuarioDigitado = htmlspecialchars($_POST['login']);
+    $senhaDigitada = htmlspecialchars($_POST['password']);
 
-    // Verifica se o usuário e a senha inseridos correspondem às credenciais corretas
-    if ($usuario === $usuarioCorreto && $senha === $senhaCorreta) {
-        // Armazena o nome do usuário na sessão para permitir acesso à área restrita
-        $_SESSION['usuario'] = $usuario;
-        
-        // Redireciona o usuário para a página restrita (dashboard)
-        header("Location: dashboard.php");
-        exit; // Encerra a execução do script
-    } else {
-        // Se as credenciais estiverem erradas, armazena uma mensagem de erro na sessão
-        $_SESSION['mensagem'] = "Usuário e/ou senha incorretos.";
-        
-        // Redireciona o usuário de volta para a página de login
-        header("Location: index.php");
-        
+    $autenticado = false; // Variável de controle para verificar se o usuário foi autenticado
+
+    // Percorre o array de usuários cadastrados para verificar se o login e a senha são válidos
+    foreach ($usuarios as $usuario) {
+        if ($usuarioDigitado === $usuario['login'] && $senhaDigitada === $usuario['senha']) {
+            $autenticado = true; // Define como verdadeiro se encontrar um usuário correspondente
+            $_SESSION['usuario'] = $usuarioDigitado; // Armazena o usuário na sessão
+            header("Location: dashboard.php"); // Redireciona para a área restrita
+            exit;
+        }
     }
+
+    // Se nenhum usuário foi autenticado, define a mensagem de erro e redireciona para o login
+    $_SESSION['mensagem'] = "Usuário e/ou senha incorretos.";
+    header("Location: login.php");
+    exit;
 }
 ?>
