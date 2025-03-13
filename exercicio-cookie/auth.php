@@ -43,6 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $autenticado = true; // Define como verdadeiro se encontrar um usuário correspondente
             $_SESSION['usuario'] = $usuarioDigitado; // Armazena o usuário na sessão
             header("Location: dashboard.php"); // Redireciona para a área restrita
+            if (isset($_POST['remember'])) {
+                // Se a opção "Lembrar de mim" estiver marcada, define um cookie com o login por 30 dias
+                setcookie('login', $usuarioDigitado, time() + 3600 * 24 * 30, '/');
+            }
             exit;
         }
     }
